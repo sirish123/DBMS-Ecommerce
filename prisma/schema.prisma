@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
+}
+
+model selleritems {
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  itemname    String?
+  itemprice   Int?
+  quantity    Int?
+  itemimage   String?
+  contact      String?
+  producttype String?
+}
+
+model advertisor{
+  id            String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  identitycode  String? @db.Uuid
+  couponcode    String?
+  redeemed      Boolean?
+}
+
+model userbankaccount {
+  id            String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  AccHolderName String?
+  Accountnum    String?
+  cvv           String?
+  Amount        Int?
+  email         String?
+}
+
+model useritems {
+  id       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email    String? 
+  itemcode String? @db.Uuid
+  quantity Int?
+  status   Int?
+}
+
+model users {
+  id       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email    String?
+  password String?
+  name     String?
+  type     String?
+}
