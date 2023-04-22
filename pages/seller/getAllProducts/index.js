@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+/* eslint-disable @next/next/no-img-element */
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { Button } from "@mui/material";
+import { useSession } from "next-auth/react";
 
-export default function Signup() {
+export default function GetAllProducts() {
   const [items, setItems] = useState([]);
-
+  const session = useSession();
+  
   useEffect(() => {
     const getItems = async () => {
       const data = await axios
@@ -18,27 +20,66 @@ export default function Signup() {
     };
     getItems();
   }, []);
-  const addToCart = async (item) => {
-    const data = await axios
-      .post("/api/user/addtocart", { email:"cs20b043@iittp.ac.in",itemcode: item, quantity: 1, status: 1 })
-      .catch((reason) => {
-        console.log(reason.response.data);
-        return reason.response.data;
-      });
-    console.log(data);
-    return data;
+
+  const addToCart = async (item, quantity) => {
+    if (quantity <= item.quantity) {
+      const data = await axios
+        .post("/api/user/addtocart", {
+          email: session.data.user.email_address,
+          itemcode: item.id,
+          quantity: quantity,
+          status: 1,
+        })
+        .catch((reason) => {
+          console.log(reason.response.data);
+          return reason.response.data;
+        });
+      console.log(data);
+      return data;
+    } else {
+      console.log(`Only ${item.quantity} available`);
+    }
   };
 
   return (
     <>
-      <div>
-        <h1>Items</h1>
+      <div style={{ display: "flex", flexWrap: "wrap" }}>
         {items &&
           items.map((item) => (
-            <div key={item.id}>
-              <h2>{item.itemname}</h2>
-              <h2>{item.itemprice}</h2>
-              <Button onClick={() => addToCart(item.id)}>Add To Cart</Button>
+            <div className="card-wrapper" key={item.id}>
+              <div className="card">
+                <img
+                  src={item.itemimage}
+                  className="card-img-top"
+                  alt=""
+                  style={{ maxWidth: "200px", maxHeight: "200px" }}
+                />
+                <div className="card-body">
+                  <h5 className="card-title">{item.itemname}</h5>
+                  <p className="card-text">{item.itemprice}</p>
+                  <div className="input-group">
+                    <input
+                      type="number"
+                      className="form-control"
+                      min="1"
+                      max={item.itemquantity}
+                      defaultValue="1"
+                      aria-label="Quantity"
+                      aria-describedby="button-addon2"
+                      style={{ maxWidth: "70px", marginRight: "5px" }}
+                    />
+                    <button
+                      className="btn btn-primary"
+                      onClick={() =>
+                        addToCart(item, parseInt(event.target.previousSibling.value))
+                      }
+                      id="button-addon2"
+                    >
+                      Add To Cart
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           ))}
       </div>

@@ -1,8 +1,16 @@
+/* eslint-disable @next/next/no-img-element */
 import React from "react";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { FormControl,MenuItem, InputLabel,Select, TextField, Button } from '@mui/material';
+import {
+  FormControl,
+  MenuItem,
+  InputLabel,
+  Select,
+  TextField,
+  Button,
+} from "@mui/material";
 import { useRouter } from "next/router";
 
 export default function BuyItem() {
@@ -63,8 +71,14 @@ export default function BuyItem() {
       bank.forEach((b) => {
         if (b.id === selectedBank) {
           if (b.cvv === cvv) {
-            alert("Payment successful");
-            router.push('/Transaction/createBank'); // route to the success page
+            if (b.Amount < totalPrice) {
+              alert("Insufficient balance choose another bank");
+              router.push("/Transaction/buyItem");
+              return;
+            } else {
+              alert("Payment successful");
+              router.push("/Transaction/createBank"); // route to the success page
+            }
           } else {
             alert("Invalid CVV");
           }
@@ -89,9 +103,17 @@ export default function BuyItem() {
               style={{ width: "18rem", margin: "10px" }}
             >
               <div className="card-body">
-                <h5 className="card-title">{item.itemname}</h5>
-                <h6 className="card-subtitle mb-2 text-muted">{item.id}</h6>
-                <p className="card-text">{item.itemprice}</p>
+                <img
+                  src={item.itemimage}
+                  className="card-img-top"
+                  alt=""
+                  style={{ maxWidth: "200px", maxHeight: "200px" }}
+                />
+                <h5 className="card-title mb-2 ">{item.itemname}</h5>
+                <h6 className="card-text mb-2 ">Quantity: {item.quantity}</h6>
+                <h6 className="card-text mb-2 ">
+                  Total Price: {item.itemprice * item.quantity}
+                </h6>
               </div>
             </div>
           ))}
@@ -107,42 +129,49 @@ export default function BuyItem() {
       </div>
       <div>
         <h2>Select a bank</h2>
-   
-    <form onSubmit={handleSubmit}>
-      <FormControl variant="outlined" sx={{ marginBottom: '1rem', minWidth: '250px' }}>
-        <InputLabel id="bank-select-label">Select a bank</InputLabel>
-        <Select
-          labelId="bank-select-label"
-          id="bank-select"
-          value={selectedBank}
-          onChange={handleBankSelection}
-          label="Select a bank"
-        >
-          {bank && bank.map((b) => (
-            <MenuItem key={b.id} value={b.id}>
-              {b.AccHolderName} - {b.Accountnum}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      {selectedBank && (
-     <div sx={{ marginBottom: '1rem' }}>
-     <TextField
-       id="cvv"
-       label="CVV"
-       variant="outlined"
-       value={cvv}
-       onChange={handleCvvInput}
-       sx={{ marginRight: '1rem', marginBottom: '1rem' }}
-     />
-     <Button variant="contained" color="primary" type="submit">
-       Pay
-     </Button>
-   </div>
-   
-     
-      )}
-    </form>
+
+        <form onSubmit={handleSubmit}>
+          <div
+            sx={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}
+          >
+            <FormControl
+              variant="outlined"
+              sx={{ marginRight: "1rem", minWidth: "250px" }}
+            >
+              <InputLabel id="bank-select-label">Select a bank</InputLabel>
+              <Select
+                labelId="bank-select-label"
+                id="bank-select"
+                value={selectedBank}
+                defaultValue=""
+                onChange={handleBankSelection}
+                label="Select a bank"
+              >
+                {bank &&
+                  bank.map((b) => (
+                    <MenuItem key={b.id} value={b.id}>
+                      {b.AccHolderName} - {b.Accountnum}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+            {selectedBank && (
+              <>
+                <TextField
+                  id="cvv"
+                  label="CVV"
+                  variant="outlined"
+                  value={cvv}
+                  onChange={handleCvvInput}
+                  sx={{ marginRight: "1rem" }}
+                />
+                <Button variant="contained" color="primary" type="submit">
+                  Pay
+                </Button>
+              </>
+            )}
+          </div>
+        </form>
       </div>
     </>
   );

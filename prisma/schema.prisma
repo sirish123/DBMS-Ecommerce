@@ -8,20 +8,22 @@ datasource db {
 }
 
 model selleritems {
-  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email       String?
   itemname    String?
   itemprice   Int?
   quantity    Int?
   itemimage   String?
-  contact      String?
+  contact     String?
   producttype String?
+  useritems   useritems[]
 }
 
-model advertisor{
-  id            String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  identitycode  String? @db.Uuid
-  couponcode    String?
-  redeemed      Boolean?
+model advertisor {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  identitycode String?  @db.Uuid
+  couponcode   String?
+  redeemed     Boolean?
 }
 
 model userbankaccount {
@@ -34,11 +36,12 @@ model userbankaccount {
 }
 
 model useritems {
-  id       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email    String? 
-  itemcode String? @db.Uuid
-  quantity Int?
-  status   Int?
+  id         String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email      String?
+  itemcode   String?      @db.Uuid
+  quantity   Int?
+  status     Int?
+  selleritem selleritems? @relation(fields: [itemcode], references: [id], onDelete: Cascade)
 }
 
 model users {
