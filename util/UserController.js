@@ -45,3 +45,13 @@ export async function getUserItems(params) {
 
   return products;
 }
+
+export async function updateCartItems(params) {
+  //1-cart, 2-purchased, 3-canclled refund in process, 4-return item in process, 5-refunded
+  const { email, status } = params;
+  const carttobuy = await prisma.$queryRaw`UPDATE useritems
+  SET status = ${status}
+  WHERE email = ${email};`;
+
+  return carttobuy;
+}

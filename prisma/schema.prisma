@@ -19,19 +19,28 @@ model selleritems {
   useritems   useritems[]
 }
 
-model advertisor {
+model advertisorcodevalue{
   id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  identitycode String?  @db.Uuid
+  email        String?  
   couponcode   String?
-  redeemed     Boolean?
+  quantity      Int?
+  producttype  String?
+}
+
+model advertisorposter{
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email        String?
+  productname  String?
+  imageurl     String?
+  producttype  String?
 }
 
 model userbankaccount {
   id            String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  AccHolderName String?
-  Accountnum    String?
+  accholdername String?
+  accountnum    String?
   cvv           String?
-  Amount        Int?
+  amount        Int?
   email         String?
 }
 
@@ -50,4 +59,10 @@ model users {
   password String?
   name     String?
   type     String?
+}
+
+model userHistory{
+ id         String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+ userid     String?
+ producttype String?
 }

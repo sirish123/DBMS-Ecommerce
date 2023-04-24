@@ -26,14 +26,14 @@ export default function Cart() {
 
   const onSubmit = async (data) => {
     if (session.data) {
-      const num = Math.ceil(Math.random() * 1000000);
+      const num = Math.ceil(Math.random() * 10000);
       const bankdata = {
         ...data,
         Amount: num,
         email: session.data.user.email_address,
       };
       const result = await postbankdetails(bankdata);
-      if (result) {
+      if (!result.data.error) {
         setIsSuccess(true);
       }
     }

@@ -36,9 +36,8 @@ export const authOptions = {
         },
         usertype: {
           label: "User Type",
-          type: "select",
-          options: ["Buyer", "Seller", "Advertisor"],
-          placeholder: "Select user type",
+          type: "text",
+          placeholder: "Buyer/Seller/Advertisor user type",
         },
       },
       async authorize(credentials, req) {
@@ -53,13 +52,11 @@ export const authOptions = {
             console.log(user);
             if (user[0].password === password) {
               return { email_address, usertype };
-            }
-            else
-            {
-              console.log("Invalid password");
+            } else {
+              return "Invalid password";
             }
           } else {
-            console.log("User not found");
+            return "User not found";
           }
         } catch (err) {
           console.log(err);

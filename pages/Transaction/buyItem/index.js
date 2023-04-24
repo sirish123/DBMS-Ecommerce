@@ -12,7 +12,6 @@ import {
   Button,
 } from "@mui/material";
 import { useRouter } from "next/router";
-
 export default function BuyItem() {
   const [cartItems, setCartItems] = useState();
   const [totalPrice, setTotalPrice] = useState(0);
@@ -46,7 +45,7 @@ export default function BuyItem() {
         setCartItems(data.data);
         let totalPrice = 0;
         data.data.forEach((item) => {
-          totalPrice += item.itemprice;
+          totalPrice += item.itemprice * item.quantity;
         });
         setTotalPrice(totalPrice);
       }
@@ -63,7 +62,23 @@ export default function BuyItem() {
   const handleCvvInput = (event) => {
     setCvv(event.target.value);
   };
-
+  const finishTransaction = async (id, balance) => {
+    if (session.data) {
+      console.log(session.data.user);
+      const data = await axios
+        .post("/api/user/buyitem", {
+          email: session.data.user.email_address,
+          status: 2,
+          id: id,
+          price: totalPrice,
+          amount: balance,
+        })
+        .catch((reason) => {
+          console.log(reason.response.data);
+        });
+      console.log(data);
+    }
+  };
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log(selectedBank, cvv);
@@ -71,12 +86,13 @@ export default function BuyItem() {
       bank.forEach((b) => {
         if (b.id === selectedBank) {
           if (b.cvv === cvv) {
-            if (b.Amount < totalPrice) {
+            if (b.amount < totalPrice) {
               alert("Insufficient balance choose another bank");
               router.push("/Transaction/buyItem");
               return;
             } else {
               alert("Payment successful");
+              finishTransaction(b.id, b.amount);
               router.push("/Transaction/createBank"); // route to the success page
             }
           } else {
@@ -150,7 +166,7 @@ export default function BuyItem() {
                 {bank &&
                   bank.map((b) => (
                     <MenuItem key={b.id} value={b.id}>
-                      {b.AccHolderName} - {b.Accountnum}
+                      {b.accholdername} - {b.accountnum}
                     </MenuItem>
                   ))}
               </Select>
