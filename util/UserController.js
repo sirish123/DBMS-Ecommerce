@@ -35,23 +35,48 @@ export async function postCartItems(params) {
   return result;
 }
 export async function getUserItems(params) {
-  console.info({ params: params });
+  const products =
+    await prisma.$queryRaw`SELECT u.*, s.itemname, s.itemprice, s.itemimage, s.quantity as seller_quantity, u.quantity as user_quantity, s.producttype
+    FROM useritems u
+    JOIN selleritems s ON u.itemcode = s.id
+    WHERE u.email = ${params.email} AND u.status = ${params.status};`;
+
+  return products;
+}
+export async function getBoughtAndReturn(params) {
+  if (params.status3 == null) {
+    const products =
+      await prisma.$queryRaw`SELECT u.*, s.itemname, s.itemprice, s.itemimage, s.producttype
+    FROM useritems u
+    JOIN selleritems s ON u.itemcode = s.id
+    WHERE u.email =  ${params.email} AND u.status = ${params.status1} OR u.status = ${params.status2};
+    `;
+    return products;
+  }
   const products =
     await prisma.$queryRaw`SELECT u.*, s.itemname, s.itemprice, s.itemimage, s.producttype
     FROM useritems u
     JOIN selleritems s ON u.itemcode = s.id
-    WHERE u.email =  ${params.email} AND u.status = ${params.status};
+    WHERE u.email =  ${params.email} AND u.status = ${params.status1} OR u.status = ${params.status2} OR u.status = ${params.status3};
     `;
-
   return products;
 }
 
 export async function updateCartItems(params) {
-  //1-cart, 2-purchased, 3-canclled refund in process, 4-return item in process, 5-refunded
   const { email, status } = params;
   const carttobuy = await prisma.$queryRaw`UPDATE useritems
   SET status = ${status}
-  WHERE email = ${email};`;
+  WHERE email = ${email} AND status = 1 ;`;
+
+  return carttobuy;
+}
+
+export async function updatereturnstatus(params) {
+  //1-cart, 2-purchased, 3-delivered,4-seller, 5-return rejected, 6-return accepted refunded
+  const { id, status } = params;
+  const carttobuy = await prisma.$queryRaw`UPDATE useritems
+  SET status = ${status}
+  WHERE id = ${id};`;
 
   return carttobuy;
 }

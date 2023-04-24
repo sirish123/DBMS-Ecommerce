@@ -72,6 +72,7 @@ export default function BuyItem() {
           id: id,
           price: totalPrice,
           amount: balance,
+          cartItems: cartItems,
         })
         .catch((reason) => {
           console.log(reason.response.data);
