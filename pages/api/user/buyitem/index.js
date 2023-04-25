@@ -7,7 +7,6 @@ export default async function handler(req, res) {
     const data = await updateCartItems(req.body);
     const bankdata = await updateBankAmount(req.body);
     const sellerdata = await updateselleritems(req.body.cartItems);
-    const 
 
     return res.status(201).json(data);
   } catch (err) {
