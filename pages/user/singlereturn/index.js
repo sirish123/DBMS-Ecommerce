@@ -1,12 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
+import { TextMolecule } from "@/components/materialuihelper";
 
 export default function AccessCart() {
   const router = useRouter();
   const { message } = router.query;
+  const { handleSubmit, control } = useForm();
   const [cartItems, setCartItems] = useState([]);
   const session = useSession();
   useEffect(() => {
@@ -14,9 +17,7 @@ export default function AccessCart() {
       if (session.data) {
         const data = await axios
           .post("/api/user/returnandbought", {
-            status1: 4,
-            status2: 5,
-            status2: 6,
+            email: session.data.user.email_address,
           })
           .catch((reason) => {
             console.log(reason.response.data);
@@ -30,7 +31,7 @@ export default function AccessCart() {
     };
     getUserItems();
   }, [session, message]);
-
+  const onSubmit = async (data) => {};
   return (
     <>
       {cartItems &&
@@ -52,6 +53,26 @@ export default function AccessCart() {
               <h6 className="card-text mb-2 ">
                 Price: {item.itemprice * item.quantity}
               </h6>
+              {item.status === 4 ? (
+                <h1>Return is under review</h1>
+              ) : item.status === 6 ? (
+                <h1>Return is approved Refund in Process</h1>
+              ) : (
+                <div>
+                  <h1>Return is rejected Seller Contact: {item.contact}</h1>
+                  <h1>File a Grievance</h1>
+                  <form onSubmit={handleSubmit(onSubmit)}>
+                    <TextMolecule
+                      fieldName="Grievance"
+                      label="Enter your Problem here"
+                      control={control}
+                    />
+                    <button className="btn btn-primary" type="submit">
+                      Submit
+                    </button>
+                  </form>
+                </div>
+              )}
             </div>
           </div>
         ))}

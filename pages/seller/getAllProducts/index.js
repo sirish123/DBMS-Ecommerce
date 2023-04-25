@@ -71,7 +71,7 @@ export default function GetAllProducts() {
                     <button
                       className="btn btn-primary"
                       onClick={() =>
-                        addToCart(item, parseInt(event.target.previousSibling.value))
+                        addToCart(item, parseInt(Event.target.previousSibling.value))
                       }
                       id="button-addon2"
                     >

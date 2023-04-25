@@ -18,22 +18,20 @@ export default function AccessCart() {
           .catch((reason) => {
             console.log(reason.response.data);
           });
-          console.log(data)
         setCartItems(data.data);
       }
     };
     getUserItems();
   }, [session]);
-  const changestatus = async (id) => {
+  const changestatus = async (id, status) => {
     const data = await axios
       .post("/api/user/singletransaction", {
         id: id,
-        status: 4,
+        status: status,
       })
       .catch((reason) => {
         console.log(reason.response.data);
       });
-    setCartItems(data.data);
     console.log(data.data);
   };
   return (
@@ -54,9 +52,29 @@ export default function AccessCart() {
               />
               <h5 className="card-title mb-2 ">{item.itemname}</h5>
               <h6 className="card-text mb-2 ">Quantity: {item.quantity}</h6>
-              <h6 className="card-text mb-2 ">
-                Price: {item.itemprice}
-              </h6>
+              <h6 className="card-text mb-2 ">Price: {item.itemprice}</h6>
+              {item.status === 4 ? (
+                <div>
+                  <button
+                    onClick={() => {
+                      changestatus(item.user_id, 6);
+                    }}
+                  >
+                    Accept Return
+                  </button>
+                  <button
+                    onClick={() => {
+                      changestatus(item.user_id, 5);
+                    }}
+                  >
+                    Reject Return
+                  </button>
+                </div>
+              ) : item.status === 5 ? (
+                <h1>Rejected</h1>
+              ) : (
+                <h1>Accepted</h1>
+              )}
             </div>
           </div>
         ))}

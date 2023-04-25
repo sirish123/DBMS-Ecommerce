@@ -44,20 +44,12 @@ export async function getUserItems(params) {
   return products;
 }
 export async function getBoughtAndReturn(params) {
-  if (params.status3 == null) {
-    const products =
-      await prisma.$queryRaw`SELECT u.*, s.itemname, s.itemprice, s.itemimage, s.producttype
-    FROM useritems u
-    JOIN selleritems s ON u.itemcode = s.id
-    WHERE u.email =  ${params.email} AND u.status = ${params.status1} OR u.status = ${params.status2};
-    `;
-    return products;
-  }
+  console.info({ params: params });
   const products =
-    await prisma.$queryRaw`SELECT u.*, s.itemname, s.itemprice, s.itemimage, s.producttype
+    await prisma.$queryRaw`SELECT u.*, s.itemname, s.itemprice, s.itemimage,s.contact, s.producttype
     FROM useritems u
     JOIN selleritems s ON u.itemcode = s.id
-    WHERE u.email =  ${params.email} AND u.status = ${params.status1} OR u.status = ${params.status2} OR u.status = ${params.status3};
+    WHERE u.email =  ${params.email} ;
     `;
   return products;
 }
@@ -73,6 +65,7 @@ export async function updateCartItems(params) {
 
 export async function updatereturnstatus(params) {
   //1-cart, 2-purchased, 3-delivered,4-seller, 5-return rejected, 6-return accepted refunded
+
   const { id, status } = params;
   const carttobuy = await prisma.$queryRaw`UPDATE useritems
   SET status = ${status}

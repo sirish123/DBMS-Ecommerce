@@ -17,8 +17,6 @@ export default function AccessCart() {
         const data = await axios
           .post("/api/user/returnandbought", {
             email: session.data.user.email_address,
-            status1: 2,
-            status2: 3,
           })
           .catch((reason) => {
             console.log(reason.response.data);
@@ -70,7 +68,7 @@ export default function AccessCart() {
                   >
                     <Button variant="contained">Track-Order</Button>
                   </Link>
-                ) : (
+                ) : item.status == 3 ? (
                   <Link
                     href={{
                       pathname: "/user/singlereturn",
@@ -92,6 +90,17 @@ export default function AccessCart() {
                       Return
                     </Button>
                   </Link>
+                ) : (
+                  <>
+                    <Link
+                      href={{
+                        pathname: "/user/singlereturn",
+                        query: { message: item.id },
+                      }}
+                    >
+                      <Button variant="contained">See Return Status</Button>
+                    </Link>
+                  </>
                 )}
               </div>
             </div>

@@ -52,11 +52,11 @@ export async function updateselleritems(params) {
 
 export async function getsellerreturnees(params) {
   const products =
-    await prisma.$queryRaw`SELECT u.id as user_id, u.email as user_email, u.quantity as user_quantity,
+    await prisma.$queryRaw`SELECT u.id as user_id, u.email as user_email, u.quantity as user_quantity, u.status as status,
   s.id as seller_id, s.email as seller_email, s.itemname, s.itemprice, s.quantity as seller_quantity, s.itemimage, s.contact, s.producttype
 FROM useritems u
 JOIN selleritems s ON u.itemcode = s.id
-WHERE u.status = 4 AND s.email = ${params};
+WHERE u.status = 4 OR u.status = 5 OR u.status = 6 AND s.email = ${params};
 `;
   return products;
 }
