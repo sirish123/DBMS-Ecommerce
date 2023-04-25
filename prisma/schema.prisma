@@ -16,6 +16,7 @@ model selleritems {
   itemimage   String?
   contact     String?
   producttype String?
+  bankid      String?     @db.Uuid
   useritems   useritems[]
 }
 
@@ -24,7 +25,9 @@ model advertisorcodevalue{
   email        String?  
   couponcode   String?
   quantity      Int?
+  percent       Int?
   producttype  String?
+  bankid       String?   @db.Uuid
 }
 
 model advertisorposter{
@@ -61,8 +64,8 @@ model users {
   type     String?
 }
 
-model userHistory{
+model userhistory{
  id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
- email        String?
+ userid       String?      @db.Uuid
  producttype  String?
 }

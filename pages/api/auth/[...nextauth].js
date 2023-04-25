@@ -37,7 +37,7 @@ export const authOptions = {
         usertype: {
           label: "User Type",
           type: "text",
-          placeholder: "Buyer/Seller/Advertisor user type",
+          placeholder: "Buyer/Seller/Advertisor",
         },
       },
       async authorize(credentials, req) {

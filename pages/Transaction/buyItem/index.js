@@ -12,9 +12,11 @@ import {
   Button,
 } from "@mui/material";
 import { useRouter } from "next/router";
+
 export default function BuyItem() {
   const [cartItems, setCartItems] = useState();
   const [totalPrice, setTotalPrice] = useState(0);
+  const [couponCode, setCouponCode] = useState("null");
   const [bank, setBank] = useState();
   const session = useSession();
   const router = useRouter();
@@ -42,7 +44,9 @@ export default function BuyItem() {
           });
 
         setBank(bankdata.data);
+        console.log(bankdata.data);
         setCartItems(data.data);
+        console.log(data.data);
         let totalPrice = 0;
         data.data.forEach((item) => {
           totalPrice += item.itemprice * item.quantity;
@@ -58,11 +62,13 @@ export default function BuyItem() {
   const handleBankSelection = (event) => {
     setSelectedBank(event.target.value);
   };
-
+  const handlecouponselection = (event) => {
+    setCouponCode(event.target.value);
+  };
   const handleCvvInput = (event) => {
     setCvv(event.target.value);
   };
-  const finishTransaction = async (id, balance) => {
+  const finishTransaction = async (id, balance, couponCode) => {
     if (session.data) {
       console.log(session.data.user);
       const data = await axios
@@ -73,6 +79,7 @@ export default function BuyItem() {
           price: totalPrice,
           amount: balance,
           cartItems: cartItems,
+          couponCode: couponCode,
         })
         .catch((reason) => {
           console.log(reason.response.data);
@@ -82,7 +89,7 @@ export default function BuyItem() {
   };
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log(selectedBank, cvv);
+
     if (selectedBank) {
       bank.forEach((b) => {
         if (b.id === selectedBank) {
@@ -93,7 +100,7 @@ export default function BuyItem() {
               return;
             } else {
               alert("Payment successful");
-              finishTransaction(b.id, b.amount);
+              finishTransaction(b.id, b.amount, couponCode);
               router.push("/Transaction/createBank"); // route to the success page
             }
           } else {
@@ -171,6 +178,14 @@ export default function BuyItem() {
                     </MenuItem>
                   ))}
               </Select>
+
+              <TextField
+                labelId="coupon-code-label"
+                id="coupon-code"
+                defaultValue=""
+                onChange={handlecouponselection}
+                label="Enter Coupon Code"
+              ></TextField>
             </FormControl>
             {selectedBank && (
               <>

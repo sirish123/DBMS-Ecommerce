@@ -10,6 +10,7 @@ export async function postSellerItemToDB(params) {
     quantity,
     contact,
     producttype,
+    bankid,
   } = params;
   const result = await prisma.selleritems.create({
     data: {
@@ -20,6 +21,7 @@ export async function postSellerItemToDB(params) {
       contact: contact,
       email: email,
       producttype: producttype,
+      bankid: bankid,
     },
   });
   return result;
@@ -32,6 +34,7 @@ export async function getAllProducts() {
 
 export async function updateselleritems(params) {
   console.info({ params: params });
+
   const transactionResult = await prisma.$transaction(
     params.map((item) => {
       return prisma.selleritems.update({

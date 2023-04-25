@@ -1,17 +1,34 @@
 import React from "react";
 import axios from "axios";
 import { useForm } from "react-hook-form";
-import {
-  TextMolecule,
-  SelectMolecule,
-  NumberMolecule,
-} from "@/components/materialuihelper";
+import { useState, useEffect } from "react";
+import { SelectMolecule, NumberMolecule } from "@/components/materialuihelper";
 import { useSession } from "next-auth/react";
 
 export default function Advertisement() {
   const { handleSubmit, control } = useForm();
   const session = useSession();
+  const [bank, setBank] = useState();
+  useEffect(() => {
+    const getbankdata = async () => {
+      if (session.data) {
+        const bankdata = await axios
+          .post("/api/bank/getbank", {
+            email: session.data.user.email_address,
+          })
+          .catch((reason) => {
+            console.log(reason.response.data);
+          });
 
+        const options = bankdata.data.map((b) => ({
+          value: b.id,
+          label: `${b.accholdername} - ${b.accountnum}`,
+        }));
+        setBank(options);
+      }
+    };
+    getbankdata();
+  }, [session]);
   const addAdvertisement = async (advdata) => {
     const data = await axios
       .post("/api/advertisor/coupon", { advdata })
@@ -25,6 +42,7 @@ export default function Advertisement() {
 
   const onSubmit = (data) => {
     const quantity = data.quantity;
+    const percent = data.percent;
     const num = Math.ceil(Math.random() * 10000);
     const couponcode = data.producttype.substring(0, 2) + num.toString();
 
@@ -33,6 +51,7 @@ export default function Advertisement() {
       const newdata = {
         ...data,
         quantity: parseInt(quantity),
+        percent: parseInt(percent),
         couponcode: couponcode,
         email: session.data.user.email_address,
       };
@@ -64,8 +83,14 @@ export default function Advertisement() {
 
   return (
     <>
-      <div>
+      {bank && <div>
         <form onSubmit={handleSubmit(onSubmit)}>
+          <NumberMolecule
+            fieldName="percent"
+            label="Discount Percentag(1% to 100%)"
+            control={control}
+          />
+
           <NumberMolecule
             fieldName="quantity"
             label="Valid for 'X amount of items"
@@ -79,11 +104,18 @@ export default function Advertisement() {
             defaultValue={"Other"}
             options={options}
           />
+          <SelectMolecule
+            fieldName="bankid"
+            label="Choose Bank Account For Deposit"
+            control={control}
+            defaultValue={"Other"}
+            options={bank}
+          />
           <button className="btn btn-primary" type="submit">
             Add Item
           </button>
         </form>
-      </div>
+      </div>}
     </>
   );
 }

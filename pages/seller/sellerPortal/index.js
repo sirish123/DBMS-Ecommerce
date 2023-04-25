@@ -1,5 +1,6 @@
 import React from "react";
 import axios from "axios";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import {
   TextMolecule,
@@ -31,9 +32,30 @@ export default function Sell() {
     { value: "Travel accessories", label: "Travel accessories" },
     { value: "Office equipment", label: "Office equipment" },
   ];
-  
+
   const { handleSubmit, control } = useForm();
   const session = useSession();
+  const [bank, setBank] = useState();
+  useEffect(() => {
+    const getbankdata = async () => {
+      if (session.data) {
+        const bankdata = await axios
+          .post("/api/bank/getbank", {
+            email: session.data.user.email_address,
+          })
+          .catch((reason) => {
+            console.log(reason.response.data);
+          });
+
+        const options = bankdata.data.map((b) => ({
+          value: b.id,
+          label: `${b.accholdername} - ${b.accountnum}`,
+        }));
+        setBank(options);
+      }
+    };
+    getbankdata();
+  }, [session]);
 
   const addSellerItems = async (selleritemdata) => {
     const data = await axios
@@ -62,46 +84,55 @@ export default function Sell() {
   };
   return (
     <>
-      <div>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <TextMolecule
-            fieldName="itemname"
-            label="Name of Item"
-            control={control}
-          />
-          <NumberMolecule
-            fieldName="itemprice"
-            label="Price of Item"
-            control={control}
-          />
-          <NumberMolecule
-            fieldName="quantity"
-            label="Number of Items in Inventory"
-            control={control}
-          />
-          <TextMolecule
-            fieldName="itemimage"
-            label="Url of Image of Item"
-            control={control}
-          />
-          <TextMolecule
-            fieldName="contact"
-            label="Contact Number of Seller"
-            control={control}
-          />
-          <SelectMolecule
-            fieldName="producttype"
-            label="Category of Item"
-            control={control}
-            defaultValue={"Other"}
-            options={options}
-          />
+      {bank && (
+        <div>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <TextMolecule
+              fieldName="itemname"
+              label="Name of Item"
+              control={control}
+            />
+            <NumberMolecule
+              fieldName="itemprice"
+              label="Price of Item"
+              control={control}
+            />
+            <NumberMolecule
+              fieldName="quantity"
+              label="Number of Items in Inventory"
+              control={control}
+            />
+            <TextMolecule
+              fieldName="itemimage"
+              label="Url of Image of Item"
+              control={control}
+            />
+            <TextMolecule
+              fieldName="contact"
+              label="Contact Number of Seller"
+              control={control}
+            />
+            <SelectMolecule
+              fieldName="producttype"
+              label="Category of Item"
+              control={control}
+              defaultValue={"Other"}
+              options={options}
+            />
+            <SelectMolecule
+              fieldName="bankid"
+              label="Choose Bank Account For Deposit"
+              control={control}
+              defaultValue={"Other"}
+              options={bank}
+            />
 
-          <button className="btn btn-primary" type="submit">
-            Add Item
-          </button>
-        </form>
-      </div>
+            <button className="btn btn-primary" type="submit">
+              Add Item
+            </button>
+          </form>
+        </div>
+      )}
     </>
   );
 }
