@@ -77,12 +77,31 @@ export async function updatereturnstatus(params) {
 export async function postusehistory(params) {
   //1-cart, 2-purchased, 3-delivered,4-seller has to decide, 5-return rejected, 6-return accepted refunded
 
- const {id, producttype} = params;
-  const result = await prisma.usehistory.create({
-    data: {
-      userid: id,
-      producttype: producttype,
-    },
-  });
+  const { email, producttype } = params;
+  const result = await prisma.$transaction(
+    params.cartItems.map((item) => {
+      return prisma.userhistory.create({
+        data: {
+          email: email,
+          producttype: item.producttype,
+        },
+      });
+    })
+  );
   return result;
+}
+
+export async function getusehistory(params) {
+  const products =
+    await prisma.$queryRaw`SELECT * FROM userhistory WHERE email = ${params};`;
+  if (products.length > 0) {
+    const result = await prisma.$transaction(
+      products.map((item) => {
+        return prisma.$queryRaw`SELECT * FROM advertisorposter WHERE producttype = ${item.producttype};`;
+      })
+    );
+    return result;
+  }
+
+  return products;
 }
