@@ -93,14 +93,32 @@ export async function postusehistory(params) {
 
 export async function getusehistory(params) {
   const products =
-    await prisma.$queryRaw`SELECT * FROM userhistory WHERE email = ${params};`;
+    await prisma.$queryRaw`SELECT * FROM userhistory WHERE email = ${params} ORDER BY createdat;`;
   if (products.length > 0) {
+    products.reverse()
+    const productTypes = [];
+    products.forEach((product) => {
+      productTypes.push(product.producttype);
+    });
+
+    const uniqueProductTypes = [];
+    const seen = {};
+
+    for (let i = 0; i < productTypes.length; i++) {
+      const type = productTypes[i];
+      if (!seen[type]) {
+        seen[type] = true;
+        uniqueProductTypes.push(type);
+      }
+    }
+    console.info({ dwdsad: uniqueProductTypes });
     const result = await prisma.$transaction(
-      products.map((item) => {
-        return prisma.$queryRaw`SELECT * FROM advertisorposter WHERE producttype = ${item.producttype};`;
+      uniqueProductTypes.map((item) => {
+        return prisma.$queryRaw`SELECT * FROM advertisorposter WHERE producttype = ${item};`;
       })
     );
-    return result;
+    const result1 = result.filter((subArr) => subArr.length > 0);
+    return result1;
   }
 
   return products;
