@@ -49,6 +49,7 @@ export default function Signup() {
             options={[
               { value: "Buyer", label: "Buyer" },
               { value: "Seller", label: "Seller" },
+              { value: "Advertisor", label: "Advertisor" }
             ]}
           ></SelectMolecule>
           <button type="submit">Check</button>
