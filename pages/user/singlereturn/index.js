@@ -4,6 +4,7 @@ import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { TextMolecule } from "@/components/materialuihelper";
 
 export default function AccessCart() {
@@ -11,6 +12,7 @@ export default function AccessCart() {
   const { message } = router.query;
   const { handleSubmit, control } = useForm();
   const [cartItems, setCartItems] = useState([]);
+  const [warehouse, setWarehouse] = useState([]);
   const session = useSession();
   useEffect(() => {
     const getUserItems = async () => {
@@ -22,6 +24,17 @@ export default function AccessCart() {
           .catch((reason) => {
             console.log(reason.response.data);
           });
+        const wdata = await axios
+          .get("/api/mongo/warehouse")
+          .catch((reason) => {
+            console.log(reason.response.data);
+          });
+        const randomIndex = Math.floor(
+          Math.random() * wdata.data.warehouses.length
+        );
+        setWarehouse(wdata.data.warehouses[randomIndex]);
+        console.log(wdata.data.warehouses[randomIndex]);
+
         data.data.forEach((key) => {
           if (key.id === message) {
             setCartItems([key]);
@@ -31,7 +44,37 @@ export default function AccessCart() {
     };
     getUserItems();
   }, [session, message]);
-  const onSubmit = async (data) => {};
+
+  const filegrivance = async (data) => {
+    if (session.data) {
+      const filedata = await axios
+        .post("/api/mongo/grievance", {
+          ...data,
+          email: session.data.user.email_address,
+          userid: message,
+        })
+        .catch((reason) => {
+          console.log(reason.response.data);
+        });
+      console.log(filedata);
+    }
+  };
+  const changestatus = async (id) => {
+    const data = await axios
+      .post("/api/user/singletransaction", {
+        id: id,
+        status: 3,
+      })
+      .catch((reason) => {
+        console.log(reason.response.data);
+      });
+    console.log(data.data);
+  };
+  const onSubmit = async (data) => {
+    if (session.data) {
+      filegrivance(data);
+    }
+  };
   return (
     <>
       {cartItems &&
@@ -57,13 +100,13 @@ export default function AccessCart() {
                 <h1>Return is under review</h1>
               ) : item.status === 6 ? (
                 <h1>Return is approved Refund in Process</h1>
-              ) : (
+              ) : item.status === 5 ? (
                 <div>
                   <h1>Return is rejected Seller Contact: {item.contact}</h1>
                   <h1>File a Grievance</h1>
                   <form onSubmit={handleSubmit(onSubmit)}>
                     <TextMolecule
-                      fieldName="Grievance"
+                      fieldName="grievance"
                       label="Enter your Problem here"
                       control={control}
                     />
@@ -72,6 +115,30 @@ export default function AccessCart() {
                     </button>
                   </form>
                 </div>
+              ) : (
+                <h1>
+                  Your product has dispatched from
+                  {warehouse && (
+                    <div>
+                      <h2>{warehouse.wname}</h2>
+                      <h2>{warehouse.address}</h2>
+                    </div>
+                  )}
+                     <Link
+                    href={{
+                      pathname: "/user/returnsandorders",
+                    }}
+                  >
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => {
+                      changestatus(message);
+                    }}
+                  >
+                    Receive product
+                  </button>
+                  </Link>
+                </h1>
               )}
             </div>
           </div>

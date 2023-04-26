@@ -55,14 +55,14 @@ export default function AccessCart() {
               <h6 className="card-text mb-2 ">Price: {item.itemprice}</h6>
               {item.status === 4 ? (
                 <div>
-                  <button
+                  <button className="btn btn-primary"
                     onClick={() => {
                       changestatus(item.user_id, 6);
                     }}
                   >
                     Accept Return
                   </button>
-                  <button
+                  <button className="btn btn-primary"
                     onClick={() => {
                       changestatus(item.user_id, 5);
                     }}

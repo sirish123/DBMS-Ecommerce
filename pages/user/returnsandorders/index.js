@@ -36,7 +36,6 @@ export default function AccessCart() {
         console.log(reason.response.data);
       });
     setCartItems(data.data);
-    console.log(data.data);
   };
   return (
     <>
@@ -63,7 +62,8 @@ export default function AccessCart() {
                 {item.status == 2 ? (
                   <Link
                     href={{
-                      pathname: "/Transaction/buyItem",
+                      pathname: "/user/singlereturn",
+                        query: { message: item.id },
                     }}
                   >
                     <Button variant="contained">Track-Order</Button>
