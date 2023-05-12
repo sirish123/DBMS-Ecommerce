@@ -1,3 +1,7 @@
+.env FILE ATTACHED IN GOOGLE CLASSROOM AND MUST BE PASTED WITHIN THE FOLDER WHICH U CLONE THE REPO IN ORDER TO ACCESS THE DBURL INFO WHICH IS A SECRET
+
+ALMOST ALL FEATURES IMPLEMENTED COCKROACHDB(SQL) AND MONGODB(NOSQL) DATABASE.
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
